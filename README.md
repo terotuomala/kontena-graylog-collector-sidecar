@@ -1,0 +1,1 @@
+# kontena-graylog-collector-sidecar
