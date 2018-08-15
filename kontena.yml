@@ -1,0 +1,97 @@
+stack: tero/graylog-collector-sidecar
+version: 1.0.0
+description: Graylog-collector-sidecar for collecting log-files from nodes.
+
+variables:
+  server_url:
+    type: string
+    from:
+      prompt: URL to the Graylog API, e.g. http://127.0.0.1:9000/api
+
+  update_interval:
+    type: integer
+    default: 10
+    from:
+      prompt: The interval in seconds the sidecar will fetch new configurations from the Graylog serve
+
+  tls_skip_verify:
+    type: boolean
+    default: true
+    from:
+      prompt: Ignore errors when the REST API was started with a self-signed certificate
+
+  send_status:
+    type: boolean
+    default: true
+    from:
+      prompt: Send the status of each backend back to Graylog and display it on the status page for the host
+
+  list_log_files:
+    type: array
+    default: /var/log
+    from:
+      prompt: Send a directory listing to Graylog and display it on the host status page, e.g. /var/log. This can also be a list of directories
+
+  node_id:
+    type: string
+    required: false
+    from:
+      prompt: Name of the Sidecar instance, will also show up in the web interface. Hostname will be used if not set.
+
+  collector_id:
+    type: string
+    default: file:/etc/graylog/collector-sidecar/collector-id
+    from:
+      prompt: Unique ID (UUID) of the instance. This can be a string or a path to an ID file
+
+  log_path:
+    type: string
+    default: /graylog-collector-sidecar
+    from:
+      prompt: A path to a directory where the Sidecar can store the output of each running collector backend
+
+  log_rotation_time:
+    type: integer
+    default: 86400
+    from:
+      prompt: Rotate the stdout and stderr logs of each collector after X seconds
+
+  log_max_age:
+    type: integer
+    default: 604800
+    from:
+      prompt: Delete rotated log files older than Y seconds
+
+  tags:
+    type: array
+    from:
+      prompt: List of configuration tags. All configurations on the server side that match the tag list will be fetched and merged by this instance
+
+  monitored_folder:
+    type: string
+    default: /var/log
+    from:
+      prompt: A monitored folder from host machine which is going to be mounted
+
+services:
+  cs:
+    image: terotuomala/collector-sidecar:latest
+    command: /usr/bin/graylog-collector-sidecar -c /graylog-collector-sidecar/collector_sidecar.yml
+    deploy:
+      strategy: daemon
+
+    environment:
+      - SERVER_URL=${server_url}
+      - UPDATE_INTERVAL=${update_interval}
+      - TLS_SKIP_VERIFY=${tls_skip_verify}
+      - SEND_STATUS=${send_status}
+      - LIST_LOG_FILES=${list_log_files}
+      - NODE_ID=${node_id}
+      - COLLECTOR_ID=${collector_id
+      - LOG_PATH=${log_path}
+      - LOG_ROTATION_TIME=${log_rotation_time}
+      - LOG_MAX_AGE=${log_max_age}
+      - TAGS=${tags}
+
+    volumes:
+      - "${monitored_folder}:${monitored_folder}:ro"
