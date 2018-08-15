@@ -1,0 +1,16 @@
+server_url: ${SERVER_URL}
+update_interval: ${UPDATE_INTERVAL}
+tls_skip_verify: ${TLS_SKIP_VERIFY}
+send_status: ${SEND_STATUS}
+list_log_files: ${LIST_LOG_FILES}
+node_id: ${NODE_ID}
+collector_id: ${COLLECTOR_ID}
+log_path: ${LOG_PATH}
+log_rotation_time: ${LOG_ROTATION_TIME}
+log_max_age: ${LOG_MAX_AGE}
+tags: ${TAGS}
+backends:
+    - name: filebeat
+      enabled: true
+      binary_path: /usr/bin/filebeat
+      configuration_path: /etc/graylog/collector-sidecar/generated/filebeat.yml
